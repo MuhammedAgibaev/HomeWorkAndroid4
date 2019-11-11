@@ -1,136 +1,88 @@
 package com.agibaev.quizapp.main;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.MenuItem;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.agibaev.quizapp.R;
 import com.agibaev.quizapp.history.HistoryFragment;
-import com.agibaev.quizapp.history.HistoryViewModel;
 import com.agibaev.quizapp.settings.SettingsFragment;
-import com.agibaev.quizapp.settings.SettingsViewModel;
+import com.agibaev.quizapp.util.SimpleFragmentAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.util.ArrayList;
+import java.util.List;
 
+public class MainActivity extends AppCompatActivity {
+    public static final String Quiz = "Quiz";
+    public static final String HISTORY = "History";
+    public static final String SETTINGS = "Settings";
+    public static final int MAIN_FRAG = 0;
+    public static final int HISTORY_FRAG = 1;
+    public static final int SETTINGS_FRAG = 2;
 
-public class MainActivity extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener {
+    @BindView(R.id.bottom_nav)
+    BottomNavigationView mBottomNavigationView;
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
 
-    private ViewPager mViewPager;
-    private MainPagerAdapter mAdapter;
-    private BottomNavigationView mBottomNav;
-    private MainViewModel mMainViewModel;
-    private HistoryViewModel mHistoryViewModel;
-    private SettingsViewModel mSettingsViewModel;
+    public static void start(Context context) {
+        context.startActivity(new Intent(context, MainActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        initViewPager();
+    }
 
-        mMainViewModel = ViewModelProviders.of(this)
-                .get(MainViewModel.class);
-        mHistoryViewModel = ViewModelProviders.of(this)
-                .get(HistoryViewModel.class);
-        mSettingsViewModel = ViewModelProviders.of(this)
-                .get(SettingsViewModel.class);
+    private void initViewPager() {
+        SimpleFragmentAdapter mSimpleFragmentAdapter = new SimpleFragmentAdapter(getSupportFragmentManager());
+        mSimpleFragmentAdapter.setFragment(getFragment());
+        viewPager.setAdapter(mSimpleFragmentAdapter);
+        setSlidePages();
+    }
 
-        mHistoryViewModel.title.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                Log.d("ololo", "Main activirty " + s);
-                mSettingsViewModel.onHistoryCleared();
+    private void setSlidePages() {
+        mBottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.nav_main:
+                    viewPager.setCurrentItem(MAIN_FRAG);
+                    setTitle(Quiz);
+                    break;
+                case R.id.nav_history:
+                    viewPager.setCurrentItem(HISTORY_FRAG);
+                    setTitle(HISTORY);
+                    break;
+                case R.id.nav_settings:
+                    viewPager.setCurrentItem(SETTINGS_FRAG);
+                    setTitle(SETTINGS);
+                    break;
             }
+            return true;
         });
+        onSlidePage();
+    }
 
-        mSettingsViewModel.title.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                Log.d("ololo", "Main activity " + s);
-            }
-        });
-
-        mViewPager = findViewById(R.id.main_view_pager);
-        mBottomNav = findViewById(R.id.main_bottom_nav);
-
-        mAdapter = new MainPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mAdapter);
-
-        mBottomNav.setOnNavigationItemSelectedListener(this);
-
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+    private void onSlidePage() {
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                int selectedItem = R.id.nav_main;
-
-                switch (position) {
-                    case 1:
-                        selectedItem = R.id.nav_history;
-                        break;
-                    case 2:
-                        selectedItem = R.id.nav_settings;
-                        break;
-                }
-
-                mBottomNav.setSelectedItemId(selectedItem);
+                mBottomNavigationView.getMenu().getItem(position).setChecked(true);
             }
         });
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        int page = 0;
-
-        switch (menuItem.getItemId()) {
-            case R.id.nav_history:
-                page = 1;
-                break;
-            case R.id.nav_settings:
-                page = 2;
-                break;
-        }
-
-        mViewPager.setCurrentItem(page);
-        return true;
-    }
-
-    private class MainPagerAdapter extends FragmentPagerAdapter {
-        public MainPagerAdapter(@NonNull FragmentManager fm) {
-            super(fm);
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment;
-
-            switch (position) {
-                case 0:
-                    fragment = new MainFragment();
-                    break;
-
-                case 1:
-                    fragment = new HistoryFragment();
-                    break;
-
-                default:
-                    fragment = new SettingsFragment();
-            }
-
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
+    private List<Fragment> getFragment() {
+        List<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(new MainFragment());
+        fragmentList.add(new HistoryFragment());
+        fragmentList.add(new SettingsFragment());
+        return fragmentList;
     }
 }

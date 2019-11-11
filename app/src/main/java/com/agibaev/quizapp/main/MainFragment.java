@@ -1,16 +1,23 @@
 package com.agibaev.quizapp.main;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import android.widget.Spinner;
 import com.agibaev.quizapp.R;
+import com.agibaev.quizapp.core.CoreFragment;
+import com.agibaev.quizapp.util.MySpinner;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public class MainFragment extends Fragment {
+
+public class MainFragment extends CoreFragment {
+
+    @BindView(R.id.spinner_category)
+    Spinner spinnerCategory;
+    @BindView(R.id.spinner_difficulty)
+    Spinner spinnerDifficulty;
+
+    private String[] category = {"ALL"};
+    private String[] difficulty = {"ALL"};
 
     private MainViewModel mViewModel;
 
@@ -19,16 +26,22 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_fragment, container, false);
+    protected int getLayoutId() {
+        return R.layout.main_fragment;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(getActivity())
-                .get(MainViewModel.class);
+    protected void initViewAfterCreated(View view) {
+        ButterKnife.bind(this, view);
+        initCategorySpinner();
+        initDifficultSpinner();
     }
 
+    private void initCategorySpinner() {
+        MySpinner.show(category, spinnerCategory, getContext());
+    }
+
+    private void initDifficultSpinner() {
+        MySpinner.show(difficulty, spinnerDifficulty, getContext());
+    }
 }
