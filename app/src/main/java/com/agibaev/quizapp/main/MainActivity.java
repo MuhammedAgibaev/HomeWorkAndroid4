@@ -3,8 +3,12 @@ package com.agibaev.quizapp.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int MAIN_FRAG = 0;
     public static final int HISTORY_FRAG = 1;
     public static final int SETTINGS_FRAG = 2;
+    private MainViewModel mViewModel;
 
     @BindView(R.id.bottom_nav)
     BottomNavigationView mBottomNavigationView;
