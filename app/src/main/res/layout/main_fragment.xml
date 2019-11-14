@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context="main.MainActivity">
+    tools:context=".main.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -94,6 +94,6 @@
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="77dp"
-            android:text="@string/start_button_text" />
+            android:text="@string/start_button_text"/>
     </RelativeLayout>
 </FrameLayout>

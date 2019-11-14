@@ -1,23 +1,23 @@
 package com.agibaev.quizapp.main;
 
-import android.content.Intent;
-import android.util.Log;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import com.agibaev.quizapp.R;
 import com.agibaev.quizapp.core.CoreFragment;
+import com.agibaev.quizapp.core.SimpleSeekBarChange;
 import com.agibaev.quizapp.quiz.QuizActivity;
 import com.agibaev.quizapp.util.ViewHelperUtil;
-
 import org.angmarch.views.NiceSpinner;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.apptik.widget.MultiSlider;
+
 
 public class MainFragment extends CoreFragment implements View.OnClickListener {
     private static final String ANY_DIFFICULTY = "ANY DIFFICULTY";
@@ -28,7 +28,6 @@ public class MainFragment extends CoreFragment implements View.OnClickListener {
     public static final String SEEK_BAR = "seekbar";
     public static final String DIFF_CATEGORY = "category";
     public static final String DIFF_DIFFICULT = "difficult";
-
     private MainViewModel mViewModel;
 
     @BindView(R.id.spinner_category)
@@ -36,7 +35,7 @@ public class MainFragment extends CoreFragment implements View.OnClickListener {
     @BindView(R.id.spinner_difficulty)
     NiceSpinner spinnerDifficulty;
     @BindView(R.id.seek_bar_amount)
-    MultiSlider mAmountSlider;
+    AppCompatSeekBar mSeekBar;
     @BindView(R.id.text_view_amount)
     TextView amountTextView;
     @BindView(R.id.quiz_start_button)
@@ -98,46 +97,26 @@ public class MainFragment extends CoreFragment implements View.OnClickListener {
     }
 
     private void getValueFromSeekBar() {
-        mAmountSlider.getThumb(0).setValue(10).setEnabled(true);
-        mAmountSlider.setOnThumbValueChangeListener(new MultiSlider.SimpleChangeListener() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mSeekBar.setMin(5);
+        }
+
+        mSeekBar.setOnSeekBarChangeListener(new SimpleSeekBarChange() {
             @Override
-            public void onValueChanged(MultiSlider multiSlider, MultiSlider.Thumb thumb, int thumbIndex, int value) {
-                amountTextView.setText(String.valueOf(value));
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                amountTextView.setText(String.valueOf(progress));
             }
         });
-        setSeekBar();
-    }
-
-    private void setSeekBar() {
-        mAmountSlider.setMin(5);
-        mAmountSlider.setMax(50);
-        mAmountSlider.setStep(1);
-    }
-
-    private void sendFakeDataToQuizActivity() {
-        if (mAmountSlider.getThumb(0).getValue() > 5 ||
-                spinnerCategory.getSelectedIndex() == 0 ||
-                spinnerDifficulty.getSelectedIndex() == 0) {
-            Toast.makeText(getContext(), "Select some questions!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        int seekBarCurrentValue = mAmountSlider.getThumb(0).getValue();
-        String category = spinnerCategory.getSelectedItem().toString();
-        String difficulty = spinnerDifficulty.getSelectedItem().toString();
-
-        Intent fakeIntent = new Intent(getContext(), QuizActivity.class);
-        fakeIntent.putExtra(SEEK_BAR, seekBarCurrentValue);
-        fakeIntent.putExtra(DIFF_CATEGORY, category);
-        fakeIntent.putExtra(DIFF_DIFFICULT, difficulty);
-        getActivity().startActivity(fakeIntent);
-
-        Log.d("ololo", "sendFakeDataToQuizActivity: " + mAmountSlider.getThumb(0).getValue());
-        Log.d("ololo", "sendFakeDataToQuizActivity: " + spinnerCategory.getSelectedItem().toString());
-        Log.d("ololo", "sendFakeDataToQuizActivity: " + spinnerDifficulty.getSelectedItem().toString());
     }
 
     @Override
     public void onClick(View v) {
-        sendFakeDataToQuizActivity();
+        QuizActivity.start(
+                getContext(),
+                mSeekBar.getProgress(),
+                spinnerCategory.getSelectedItem().toString(),
+                spinnerDifficulty.getSelectedItem().toString());
     }
 }

@@ -1,4 +1,4 @@
-package com.agibaev.quizapp.repository;
+package com.agibaev.quizapp.data;
 
 import com.agibaev.quizapp.model.QuizQuestions;
 import java.util.List;

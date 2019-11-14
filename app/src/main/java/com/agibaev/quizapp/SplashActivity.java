@@ -5,8 +5,9 @@ import android.os.CountDownTimer;
 import androidx.appcompat.app.AppCompatActivity;
 import com.agibaev.quizapp.main.MainActivity;
 
+
 public class SplashActivity extends AppCompatActivity {
-    private long mills = 1000;
+    private long mills = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
