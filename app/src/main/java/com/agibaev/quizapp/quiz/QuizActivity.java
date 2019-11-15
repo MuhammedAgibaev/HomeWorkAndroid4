@@ -9,16 +9,16 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
-
 import com.agibaev.quizapp.R;
-
-import static com.agibaev.quizapp.main.MainFragment.DIFF_CATEGORY;
-import static com.agibaev.quizapp.main.MainFragment.DIFF_DIFFICULT;
-import static com.agibaev.quizapp.main.MainFragment.SEEK_BAR;
 
 public class QuizActivity extends AppCompatActivity {
     private QuizViewModel mQuizViewModel;
     private TextView textView;
+    public static final String ANY_DIFFICULTY = "ANY DIFFICULTY";
+    public static final String ANY_CATEGORY = "ANY CATEGORY";
+    public static final String SEEK_BAR = "seekbar";
+    public static final String DIFF_CATEGORY = "category";
+    public static final String DIFF_DIFFICULT = "difficult";
 
     public static void start(Context context, int seekBarValue, String categoryValue, String difficultValue){
         Intent fakeIntent = new Intent(context, QuizActivity.class);

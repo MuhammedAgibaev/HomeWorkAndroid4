@@ -18,16 +18,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.agibaev.quizapp.quiz.QuizActivity.ANY_CATEGORY;
+import static com.agibaev.quizapp.quiz.QuizActivity.ANY_DIFFICULTY;
+
 
 public class MainFragment extends CoreFragment implements View.OnClickListener {
-    private static final String ANY_DIFFICULTY = "ANY DIFFICULTY";
-    private static final String ANY_CATEGORY = "ANY CATEGORY";
-    private static final String EASY = "EASY";
-    private static final String MEDIUM = "MEDIUM";
-    private static final String HARD = "HARD";
-    public static final String SEEK_BAR = "seekbar";
-    public static final String DIFF_CATEGORY = "category";
-    public static final String DIFF_DIFFICULT = "difficult";
     private MainViewModel mViewModel;
 
     @BindView(R.id.spinner_category)
@@ -89,9 +84,9 @@ public class MainFragment extends CoreFragment implements View.OnClickListener {
 
     private void initDifficultSpinner() {
         List<String> difficulty = new LinkedList<>(Arrays.asList(ANY_DIFFICULTY));
-        difficulty.add(EASY);
-        difficulty.add(MEDIUM);
-        difficulty.add(HARD);
+        difficulty.add("EASY");
+        difficulty.add("MEDIUM");
+        difficulty.add("HARD");
         ViewHelperUtil.show(difficulty, spinnerDifficulty);
         getValueFromSeekBar();
     }
