@@ -1,29 +1,46 @@
 package com.agibaev.quizapp.quiz;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.agibaev.quizapp.R;
 
-public class QuizActivity extends AppCompatActivity {
-    private QuizViewModel mQuizViewModel;
-    private TextView textView;
-    public static final String ANY_DIFFICULTY = "ANY DIFFICULTY";
-    public static final String ANY_CATEGORY = "ANY CATEGORY";
-    public static final String SEEK_BAR = "seekbar";
-    public static final String DIFF_CATEGORY = "category";
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class QuizActivity extends AppCompatActivity implements QuizAdapter.OnItemClickListener {
+    public static final String SEEK_BAR = "amount";
+    public static final String CATEGORY_NAME = "category";
     public static final String DIFF_DIFFICULT = "difficult";
 
-    public static void start(Context context, int seekBarValue, String categoryValue, String difficultValue){
+    private QuizViewModel mQuizViewModel;
+    private QuizAdapter mQuizAdapter;
+    private int amount;
+
+    @BindView(R.id.quiz_recycler_view)
+    RecyclerView mQuizRecycler;
+    @BindView(R.id.quiz_question_amount)
+    TextView amountProgressView;
+    @BindView(R.id.navigation)
+    TextView categoryTextView;
+    @BindView(R.id.quiz_progress_bar)
+    ProgressBar amountProgressBar;
+
+    public static void start(Context context, int amount, int category, String difficultValue) {
         Intent fakeIntent = new Intent(context, QuizActivity.class);
-        fakeIntent.putExtra(SEEK_BAR, seekBarValue);
-        fakeIntent.putExtra(DIFF_CATEGORY, categoryValue);
+        fakeIntent.putExtra(SEEK_BAR, amount);
+        fakeIntent.putExtra(CATEGORY_NAME, category);
         fakeIntent.putExtra(DIFF_DIFFICULT, difficultValue);
         context.startActivity(fakeIntent);
     }
@@ -32,18 +49,58 @@ public class QuizActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        mQuizViewModel = ViewModelProviders.of(this).get(QuizViewModel.class);
-        textView = findViewById(R.id.text_toast);
-        showFakeData();
+        mQuizViewModel = ViewModelProviders.of(this)
+                .get(QuizViewModel.class);
+
+        ButterKnife.bind(this);
+        initViewModel();
+        showQuizData();
     }
 
-    private void showFakeData() {
-        Intent fakeIntent = getIntent();
-        int seekBar = fakeIntent.getIntExtra(SEEK_BAR, 0);
-        String category = fakeIntent.getStringExtra(DIFF_CATEGORY);
-        String difficulty = fakeIntent.getStringExtra(DIFF_DIFFICULT);
-        Log.d("ololo", "onActivityResult: " + seekBar + " " + category + " " + difficulty);
-        Toast.makeText(this, "onActivityResult: " + seekBar + "\n" + " " + category + " " + difficulty, Toast.LENGTH_SHORT).show();
-        textView.setText("onActivityResult: " + seekBar + "\n" + " " + category + " " + difficulty);
+    @SuppressLint("SetTextI18n")
+    private void initViewModel() {
+        mQuizViewModel.questions.observe(this, questions -> {
+            mQuizAdapter.setQuestions(questions);
+            categoryTextView.setText(questions.get(0).getCategory());
+            amountProgressBar.setMax(questions.size());
+        });
+
+        mQuizViewModel.finishEvent.observe(this, aVoid -> finish());
+        mQuizViewModel.currentQuestionPosition.observe(this, position -> {
+            amountProgressView.setText((position + 1) + "/" + amount);
+            amountProgressBar.setProgress(position + 1);
+            mQuizRecycler.smoothScrollToPosition(position + 1);
+        });
+        initRecycler();
     }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initRecycler() {
+        mQuizAdapter = new QuizAdapter(this);
+        mQuizRecycler.setHasFixedSize(true);
+        mQuizRecycler.setAdapter(mQuizAdapter);
+        mQuizRecycler.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
+        mQuizRecycler.setOnTouchListener((v, event) -> true);
+    }
+
+    private void showQuizData() {
+        mQuizViewModel.parseIntentData(getIntent());
+        amount = getIntent().getIntExtra(SEEK_BAR, 0);
+    }
+
+    @Override
+    public void onAnswerClick(int questionPosition, int answerPosition) {
+        mQuizViewModel.onAnswerClick(questionPosition, answerPosition);
+    }
+
+    @OnClick(R.id.skip_button)
+    void onSkipClick(View view) {
+        mQuizViewModel.onSkipButtonClick();
+    }
+
+    @OnClick(R.id.image_view_previous)
+    void onBackToPreviousQuestion(View view) {
+        mQuizViewModel.onPreviousQuestion();
+    }
+}
 }

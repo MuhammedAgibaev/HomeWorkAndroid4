@@ -1,8 +1,10 @@
-package com.agibaev.quizapp;
+package com.agibaev.quizapp.splash;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.agibaev.quizapp.R;
 import com.agibaev.quizapp.main.MainActivity;
 
 

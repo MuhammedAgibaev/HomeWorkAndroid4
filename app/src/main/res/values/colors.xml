@@ -13,4 +13,5 @@
     <color name="colorOfTextViewQuiz">#000</color>
     <color name="colorOfColorSecondary">#ECEBED</color>
     <color name="colorOfStatusBar">#FFFFFF</color>
+    <color name="colorOfTitleQuizActivity">#1A051D</color>
 </resources>
